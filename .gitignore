@@ -15,3 +15,7 @@ dist/
 # IDE folders (optional)
 .vscode/
 .idea/
+
+#testing stuff not relevant cuz it will be added to another part
+/App functionality/testing.py
+/App functionality/other_non_app.py

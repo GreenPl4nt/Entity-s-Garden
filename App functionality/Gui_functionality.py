@@ -5,15 +5,25 @@ import Save_state_manipulation as ssm
 import button_functionality as bf
 import Update_functionality as uf
 from pathlib import Path
+import pywinstyles
 import os
 
 appdata_path = os.getenv("LOCALAPPDATA")
+
+TRANSPARENT_BACKGROUND = "#000001"
 
 #Complete sintetized functionality of frame for Killers and Survivors
 
 class FunctionalGrid(customtkinter.CTkScrollableFrame):
     def __init__(self, master, characters:list, character_name:str,save_file_name:str):
-        super().__init__(master)
+        super().__init__(master, fg_color=TRANSPARENT_BACKGROUND)
+
+        pywinstyles.set_opacity(self, color=TRANSPARENT_BACKGROUND)
+
+        bg_lable = customtkinter.CTkLabel(self._parent_canvas, text="", image=ie.bg_images()[f"{character_name}_background"])
+        bg_lable.grid(row=0, column=0, sticky="nsew")
+        bg_lable.lower()
+  
 
         self.save_name = save_file_name
         self.font = customtkinter.CTkFont(family="Roboto", size=15, weight="bold")
@@ -38,6 +48,8 @@ class FunctionalGrid(customtkinter.CTkScrollableFrame):
 
             if self.character_name == "Killers":
                 char_label = customtkinter.CTkLabel(self, text=f"The {i}")
+                char_label.lift()
+
                 if self.save_state[i] == 0:
                     char_button = customtkinter.CTkButton(self, 
                                                           image=self.character_images[cleaned_name], 
@@ -49,6 +61,8 @@ class FunctionalGrid(customtkinter.CTkScrollableFrame):
                                                                                   on_image=on_img,
                                                                                   off_image=off_img,
                                                                                   char_type=character_name))
+                    char_button.lift()
+
                 elif self.save_state[i] == 1:
                     char_button = customtkinter.CTkButton(self,
                                                           image=self.icons["dead survivor"],
@@ -65,6 +79,8 @@ class FunctionalGrid(customtkinter.CTkScrollableFrame):
 
             elif self.character_name == "Survivors":
                 char_label = customtkinter.CTkLabel(self, text=i, font=self.font)
+                char_label.lift()
+
                 if self.save_state[i] == 0:
                     char_button = customtkinter.CTkButton(self, 
                                                           image=self.character_images[cleaned_name], 
@@ -76,6 +92,8 @@ class FunctionalGrid(customtkinter.CTkScrollableFrame):
                                                                                   on_image=on_img,
                                                                                   off_image=off_img,
                                                                                   char_type=character_name))
+                    char_button.lift()
+
                 elif self.save_state[i] == 1:
                     char_button = customtkinter.CTkButton(self,
                                                           image=self.icons["dead survivor"],
@@ -116,11 +134,15 @@ class MakeAndChooseSaves(customtkinter.CTkFrame):
         dir_path = Path(self.save_path)
         files_list = [i for i in dir_path.iterdir() if i.is_file()]
 
+
+
         for i in files_list:
 
             self.grid_rowconfigure(self.row, weight=1)
             save_name = Path(f"{self.save_path}/{i}").stem
             if char_type == "Killers": 
+      
+
                 save_button = customtkinter.CTkButton(self, 
                                                     text=f"{save_name}",
                                                     command= lambda save=save_name, : bf.switch_window(master,FunctionalGrid(master, 
@@ -156,30 +178,47 @@ class MakeAndChooseSaves(customtkinter.CTkFrame):
 
 class MainMenu(customtkinter.CTkFrame):
     def __init__(self, master):
-        super().__init__(master)
-
+        super().__init__(master, fg_color="transparent")
+        
         self.rowconfigure(0, weight=1)
         self.columnconfigure((0,1,2), weight=1)
+
+        bg_lable = customtkinter.CTkLabel(self, text="", image=ie.bg_images()["main_menu_bg"])
+        bg_lable.grid(row=0, column=0, columnspan=3, rowspan=2, sticky="nsew")    
+
 
         killerbutton = customtkinter.CTkButton(self, 
                                                text="", 
                                                image= ie.other_images()["killers_icon"],
-                                               fg_color="transparent",
+                                               fg_color="black",
+                                               width=0,
+                                               height=0,
+                                               corner_radius=0,
                                                command= lambda: bf.switch_window(master,MakeAndChooseSaves(master,char_type="Killers")))
+        killerbutton.grid(row=0,column=0, padx= 10, pady= (0,10))        
+        pywinstyles.set_opacity(killerbutton,color="black")
+
+        killerbutton.lift()
+
         survivorbutton = customtkinter.CTkButton(self, text="", 
                                                  image= ie.other_images()["survivors_icon"],
-                                                 fg_color="transparent",
+                                                 fg_color="black",
+                                                 width=0,
+                                                 height=0,                                                 
                                                  command= lambda: bf.switch_window(master,MakeAndChooseSaves(master,char_type="Survivors")))
+        survivorbutton.grid(row=0,column=1, padx= 10, pady= (0,10))
+        pywinstyles.set_opacity(survivorbutton,color="black")        
+        survivorbutton.lift()
+        
         updatebutton = customtkinter.CTkButton(self, text="", 
                                                image= ie.other_images()["update_icon"],
-                                               fg_color="transparent",
-                                               command= lambda: uf.check_for_updates(master, version=master.version))
-
-
-        killerbutton.grid(row=0,column=0, padx= 10, pady= (0,10))
-        survivorbutton.grid(row=0,column=1, padx= 10, pady= (0,10))
+                                               fg_color="black",
+                                               width=0,
+                                               height=0,                                               
+                                               command= lambda: uf.check_for_updates(master, version=master.version))       
         updatebutton.grid(row=0, column=2, padx= 10, pady= (0,10))
-
+        pywinstyles.set_opacity(updatebutton,color="black")
+        updatebutton.lift()
 
 
 
@@ -193,6 +232,7 @@ class MainApp(customtkinter.CTk):
         self.geometry("900x500")
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
+
 
         self.funcgrid = MainMenu(self) 
         self.funcgrid.grid(row= 0, column= 0, columnspan=2, padx= 0, pady= (10,0), sticky="nsew")

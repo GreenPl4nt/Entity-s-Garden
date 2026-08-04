@@ -23,3 +23,14 @@ def extract_images(path:str,clist:list):
     return img_dict
 
 
+def bg_images():
+     path="./Info/assets/backgrounds/"
+     backgrounds = ["main_menu_bg", "Killers_background", "Survivors_background"]
+     img_dict = {}
+
+     for i in backgrounds:
+          image = customtkinter.CTkImage(light_image= Image.open(f"{path}/{i}.jpg"),
+                                                                size= (1920,839))
+          img_dict[i] = image
+
+     return img_dict
