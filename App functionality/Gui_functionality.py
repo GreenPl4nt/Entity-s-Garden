@@ -4,6 +4,7 @@ import Image_extraction as ie
 import Save_state_manipulation as ssm
 import button_functionality as bf
 import Update_functionality as uf
+import regulation_version as rv
 from pathlib import Path
 import pywinstyles
 import os
@@ -15,7 +16,7 @@ TRANSPARENT_BACKGROUND = "#000001"
 #Complete sintetized functionality of frame for Killers and Survivors
 
 class FunctionalGrid(customtkinter.CTkScrollableFrame):
-    def __init__(self, master, characters:list, character_name:str,save_file_name:str):
+    def __init__(self, master, character_name:str,save_file_name:str):
         super().__init__(master, fg_color=TRANSPARENT_BACKGROUND)
 
         pywinstyles.set_opacity(self, color=TRANSPARENT_BACKGROUND)
@@ -28,26 +29,35 @@ class FunctionalGrid(customtkinter.CTkScrollableFrame):
         self.save_name = save_file_name
         self.font = customtkinter.CTkFont(family="Roboto", size=15, weight="bold")
         self.character_name = character_name
-        self.character = characters
-        cleaned_names = [char.replace('"','') for char in characters]
-        self.character_images = ie.extract_images(f"./Info/assets/Character assets/{character_name}",cleaned_names)
-        self.icons = ie.other_images()
-        self.save_state = ssm.check_character_state(character_name,save_file_name)
+
+
+
+        self.save = rv.save_file_normalization(character_name, save_file_name)
+        self.game_mode = next(iter(self.save))
+        self.save_state = self.save[next(iter(self.save))]
         self.labels = []
         self.buttons_dict = {}
 
+
+
+        self.character = list(self.save_state.keys())
+        cleaned_names = [char.replace('"','').replace(':','') for char in self.character]
+
+        self.icons = ie.other_images(self.game_mode, character_name, cleaned_names)  
+        
+        self.character_images = ie.extract_images(f"./Info/assets/Character assets/",character_name,cleaned_names, self.game_mode)
+        
         column = 0
         row = 0
 
-        for i in self.character[:-1]:
-
+        for i in self.character:
             self.grid_columnconfigure(column, weight=1)
-            cleaned_name = i.replace('"','')
+            cleaned_name = i.replace('"','').replace(':','')
 
-            #Button functionality for Killers
+#Button functionality for Killers
 
             if self.character_name == "Killers":
-                char_label = customtkinter.CTkLabel(self, text=f"The {i}")
+                char_label = customtkinter.CTkLabel(self, text=f"The {i}" if self.game_mode == "normal" else i)
                 char_label.lift()
 
                 if self.save_state[i] == 0:
@@ -55,7 +65,8 @@ class FunctionalGrid(customtkinter.CTkScrollableFrame):
                                                           image=self.character_images[cleaned_name], 
                                                           text="", 
                                                           fg_color="transparent",
-                                                          command=lambda cn=i, on_img=self.character_images[cleaned_name], off_img=self.icons["dead survivor"]: bf.switch_image(self,button=self.buttons_dict[cn],
+                                                          command=lambda cn=i, on_img=self.character_images[cleaned_name], 
+                                                                                  off_img=self.icons[cleaned_name] if self.game_mode == "abc" else self.icons["dead survivor"]: bf.switch_image(self,button=self.buttons_dict[cn],
                                                                                   save=save_file_name,
                                                                                   character=cn,
                                                                                   on_image=on_img,
@@ -65,17 +76,17 @@ class FunctionalGrid(customtkinter.CTkScrollableFrame):
 
                 elif self.save_state[i] == 1:
                     char_button = customtkinter.CTkButton(self,
-                                                          image=self.icons["dead survivor"],
+                                                          image=self.icons[cleaned_name] if self.game_mode == "abc" else self.icons["dead survivor"],
                                                           text="", 
                                                           fg_color="transparent",
-                                                          command=lambda cn=i, on_img=self.character_images[cleaned_name], off_img=self.icons["dead survivor"]: bf.switch_image(self,button=self.buttons_dict[cn],
+                                                          command=lambda cn=i, on_img=self.character_images[cleaned_name], off_img=self.icons[cleaned_name] if self.game_mode == "abc" else self.icons["dead survivor"]: bf.switch_image(self,button=self.buttons_dict[cn],
                                                                                   save=save_file_name,
                                                                                   character=cn,
                                                                                   on_image=on_img,
                                                                                   off_image=off_img,
                                                                                   char_type=character_name))
             
-            #Button functionality for survivors
+#Button functionality for survivors
 
             elif self.character_name == "Survivors":
                 char_label = customtkinter.CTkLabel(self, text=i, font=self.font)
@@ -86,7 +97,7 @@ class FunctionalGrid(customtkinter.CTkScrollableFrame):
                                                           image=self.character_images[cleaned_name], 
                                                           text="", 
                                                           fg_color="transparent",
-                                                          command=lambda cn=i, on_img=self.character_images[cleaned_name], off_img=self.icons["dead survivor"]: bf.switch_image(self,button=self.buttons_dict[cn],
+                                                          command=lambda cn=i, on_img=self.character_images[cleaned_name], off_img=self.icons[cleaned_name] if self.game_mode == "abc" else self.icons["dead survivor"]: bf.switch_image(self,button=self.buttons_dict[cn],
                                                                                   save=save_file_name,
                                                                                   character=cn,
                                                                                   on_image=on_img,
@@ -96,10 +107,10 @@ class FunctionalGrid(customtkinter.CTkScrollableFrame):
 
                 elif self.save_state[i] == 1:
                     char_button = customtkinter.CTkButton(self,
-                                                          image=self.icons["dead survivor"],
+                                                          image=self.icons[cleaned_name] if self.game_mode == "abc" else self.icons["dead survivor"],
                                                           text="", 
                                                           fg_color="transparent",
-                                                          command=lambda cn=i, on_img=self.character_images[cleaned_name], off_img=self.icons["dead survivor"]: bf.switch_image(self,button=self.buttons_dict[cn],
+                                                          command=lambda cn=i, on_img=self.character_images[cleaned_name], off_img=self.icons[cleaned_name] if self.game_mode == "abc" else self.icons["dead survivor"]: bf.switch_image(self,button=self.buttons_dict[cn],
                                                                                   save=save_file_name,
                                                                                   character=cn,
                                                                                   on_image=on_img,
@@ -146,14 +157,12 @@ class MakeAndChooseSaves(customtkinter.CTkFrame):
                 save_button = customtkinter.CTkButton(self, 
                                                     text=f"{save_name}",
                                                     command= lambda save=save_name, : bf.switch_window(master,FunctionalGrid(master, 
-                                                                                                        characters=ce.killer_list(), 
                                                                                                         character_name=char_type,
                                                                                                         save_file_name= save)))
             elif char_type == "Survivors" : 
                 save_button = customtkinter.CTkButton(self, 
                                                     text=f"{save_name}",
                                                     command= lambda save=save_name, : bf.switch_window(master,FunctionalGrid(master, 
-                                                                                                        characters=ce.survivor_list(), 
                                                                                                         character_name=char_type,
                                                                                                         save_file_name= save)))                
             save_button.grid(row=self.row,column=0,padx= 10, pady= (10,10),sticky="ew")
