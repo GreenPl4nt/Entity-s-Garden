@@ -69,5 +69,5 @@ Installing the Entity's Garden is really easy!
 2. Download the installer file (`DBD.Challenge.Tracking.App.-.Installer.V1.1.3.exe`)
 3. Run the Installer and just follow the instructions.
 4. Launch ***DBD Challenge tracking App***
-> [NOTE!]
+> [!NOTE]
 > Currently the app is called `DBD Challenge Tracking App` which is a placeholder name, next update the name will change to `Entity's Garden`
